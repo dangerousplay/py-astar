@@ -3,10 +3,14 @@
 A simple `A*` implementation using `matplotlib` to visualize the shortest path found from a point to another one.
 This implementation was made during the discipline of complexities of algorithms during Computer Science at La Salle university.
 
+
 ## Implementation
 
-The implementation uses `numpy` array to store the representation of the terrain.
-The value `-1` represents an obstacle on the terrain.
+- The implementation uses `numpy` array to store the representation of the terrain.
+- The value `-1` represents an obstacle on the terrain.
+- Each coordinate may contain a specific weight.
+  - The weight is considered by the implementation when searching for a path.
+
 
 ## Running
 
