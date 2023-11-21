@@ -45,7 +45,7 @@ class AStarTestCase(unittest.TestCase):
             start = solution[0]
             end = solution[-1]
 
-            actual = a_star_find(grid, start, end)
+            actual, _ = a_star_find(grid, start, end)
 
             self.assertEqual(actual, solution)
 

@@ -5,10 +5,10 @@ import numpy as np
 
 from heap import Heap
 
-
 Point = Tuple[int, int]
 
-def squared_distance(pos_a, pos_b):
+
+def distance(pos_a, pos_b):
     x = pos_b[0] - pos_a[0]
     y = pos_b[1] - pos_a[1]
 
@@ -23,10 +23,10 @@ class Cell:
     h_cost: int
     f_cost: int
 
-    def __init__(self, position: Point, start: Point, end: Point, weight: int = 0):
+    def __init__(self, position: Point, end: Point, g_cost: int, weight: int = 0):
         self.position = position
-        self.g_cost = squared_distance(position, start)
-        self.h_cost = squared_distance(position, end)
+        self.g_cost = g_cost
+        self.h_cost = distance(position, end)
         self.came_from = None
         self.weight = weight
 
@@ -70,20 +70,16 @@ class Cell:
 
 def get_neighbours(matrix: np.ndarray, x: int, y: int, allow_diagonal_movement=False):
     rows, cols = len(matrix), len(matrix[0])
-    deltas = list(set(itertools.permutations([-1, 0, 1] * 2, 2)))
+
+    potential_neighbours = [(x, y + 1), (x, y - 1), (x + 1, y), (x - 1, y)]
+
+    if allow_diagonal_movement:
+        potential_neighbours += [(x + 1, y + 1), (x + 1, y - 1), (x - 1, y - 1), (x - 1, y + 1)]
 
     neighbours = []
 
-    for dx, dy in deltas:
-        nx, ny = x + dx, y + dy
-
-        if nx == x and ny == y:
-            continue
-
+    for nx, ny in potential_neighbours:
         if 0 <= nx < rows and 0 <= ny < cols:
-            if dx != 0 and dy != 0 and not allow_diagonal_movement:
-                continue
-
             neighbours.append((nx, ny))
 
     return neighbours
@@ -93,17 +89,19 @@ def is_inaccessible(grid, pos):
     return grid[pos[0], pos[1]] < 0
 
 
-def a_star_find(grid: np.ndarray, start: Point, goal: Point) -> List[Point]:
+def a_star_find(grid: np.ndarray, start: Point, goal: Point) -> Tuple[List[Point], int]:
     evaluated_cells = set()
+    start_cell = Cell(start, goal, g_cost=1)
+
     open_cells = Heap()
-    open_cells.insert(Cell(start, start, goal))
+    open_cells.insert(start_cell)
 
     current: Optional[Cell] = None
+    cost = 0
 
     while len(open_cells) > 0:
         # remove the node with lowest f score
         current = open_cells.extract()
-        evaluated_cells.add(current.position)
 
         node_position = current.position
 
@@ -116,9 +114,11 @@ def a_star_find(grid: np.ndarray, start: Point, goal: Point) -> List[Point]:
             if nb in evaluated_cells or is_inaccessible(grid, nb):
                 continue
 
-            nb_cell = Cell(nb, start, goal, weight=grid[nb[0]][nb[1]])
+            nb_cell = Cell(nb, goal, g_cost=current.g_cost + 1, weight=grid[nb[0]][nb[1]])
             nb_cell.came_from = current
             open_cells.insert(nb_cell)
+
+        evaluated_cells.add(current.position)
 
     path = []
 
@@ -126,5 +126,8 @@ def a_star_find(grid: np.ndarray, start: Point, goal: Point) -> List[Point]:
         path.append(current.position)
         current = current.came_from
 
+        if current is not None and current.came_from is not None:
+            cost += 1 + current.weight
+
     # Reverse the path points to return it from start to end
-    return path[::-1]
+    return path[::-1], cost

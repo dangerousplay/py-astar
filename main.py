@@ -9,8 +9,9 @@ from matplotlib.colors import LinearSegmentedColormap
 from astar import is_inaccessible, a_star_find
 
 
-def to_int(x) -> List[int]:
-    numbers = filter(lambda n: len(n) > 0, x)
+def to_int(x: List[str]) -> List[int]:
+    numbers = map(lambda n: n.strip(), x)
+    numbers = filter(lambda n: len(n) > 0, numbers)
     numbers = map(int, numbers)
 
     return list(numbers)
@@ -29,7 +30,7 @@ def plot_map(grid):
     img = ax.imshow(grid, cmap=cmap)
 
     # Set color limits to define the range of values that each color in the colormap represents
-    img.set_clim(-1, grid.max() +3)
+    img.set_clim(-1, grid.max() + 3)
 
     # Show the weight of each cell
     for i in range(grid.shape[0]):
@@ -46,7 +47,7 @@ def annotate_solution(grid, solution):
         if is_inaccessible(actual_solution_map, pos):
             actual_solution_map[pos[0], pos[1]] = math.inf
         else:
-            actual_solution_map[pos[0], pos[1]] = 5
+            actual_solution_map[pos[0], pos[1]] = 50
     return actual_solution_map
 
 
@@ -85,6 +86,11 @@ def main(input, output, goal):
     print(f"Generating solution file {output}")
 
     plt.savefig(output, dpi=100, bbox_inches='tight')
+
+    solution_coordinates = list(map(lambda x: f"{x[0]},{x[1]}", solution))
+    solution_coordinates = " ".join(solution_coordinates)
+
+    print(f"{cost} {solution_coordinates}")
 
 
 if __name__ == '__main__':
