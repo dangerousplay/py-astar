@@ -26,7 +26,7 @@ pip install -r requirements.txt
 Generating a solution for a map:
 
 ```shell
-python ./main.py --input "input-example"
+python ./main.py --input "inputs/simple" --goal "1 13"
 ```
 
 ### Example of solution
@@ -39,8 +39,8 @@ python ./main.py --input "input-example"
 The implementation expects the input map file to have the following layout:
 
 ```text
+<x_size> <y_size>
 <start_x> <start_y>
-<end_x> <end_y>
 <weight> <weight> <weight> <weight> <weight>
 <weight> <weight> <weight> <weight> <weight>
 <weight> <weight> <weight> <weight> <weight>

@@ -51,11 +51,14 @@ def annotate_solution(grid, solution):
 
 
 @click.command()
-@click.option('--input', type=click.File('r'), help='The file containing the coordinates.', default="input-example")
+@click.option('--input', type=click.File('r'), help='The file containing the coordinates.', default="inputs/weighted")
 @click.option('--output', help='The path for the solution image.', default="solution.png")
-def main(input, output):
+@click.option('--goal', help='The goal coordinate.', prompt=True)
+def main(input, output, goal):
+    # Skip the first line
+    input.readline()
+
     start = to_int(input.readline().split(" "))
-    end = to_int(input.readline().split(" "))
 
     lines: List[str] = input.readlines()
 
@@ -67,7 +70,15 @@ def main(input, output):
 
     grid = np.array(grid)
 
-    solution = a_star_find(grid, tuple(start), tuple(end))
+    end = to_int(goal.split(" "))
+
+    solution, cost = a_star_find(grid, tuple(start), tuple(end))
+
+    plot_map(grid)
+
+    print("Plotting input into file input.png")
+
+    plt.savefig("input.png", dpi=100, bbox_inches='tight')
 
     plot_map(annotate_solution(grid, solution))
 
