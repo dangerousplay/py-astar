@@ -1,3 +1,4 @@
+from enum import Enum
 import math
 from typing import Any, List, TypeVar, Optional
 
@@ -59,12 +60,26 @@ def build_heap(heap, heapify_func=min_heapify):
         heapify_func(heap, n - i, heap_size)
 
 
+class HeapType(Enum):
+    MIN = 1
+    MAX = 2
+
+
+def _gt(a, b):
+    return a > b
+
+
+def _lt(a, b):
+    return a < b
+
+
 class Heap:
     _array: List[T]
     _size: int
 
-    def __init__(self, heapify_func=min_heapify):
-        self._heapify_func = heapify_func
+    def __init__(self, heap_type: HeapType = HeapType.MIN):
+        self._heapify_func = min_heapify if heap_type == HeapType.MIN else max_heapify
+        self._element_cmp = _lt if heap_type == HeapType.MIN else _gt
         self._array = []
         self._size = 0
 
@@ -95,7 +110,8 @@ class Heap:
         self._array.append(value)
 
         i = self._size - 1
-        while i > 0 and value > self._array[parent(i)]:
+
+        while i > 0 and self._element_cmp(value, self._array[parent(i)]):
             swap(self._array, i, parent(i))
             i = parent(i)
 
